@@ -56,22 +56,22 @@ class UpdateController extends Controller
         // Catatan rilis statis untuk tab Aplikasi
         $appUpdates = [
             [
-                'version' => 'Versi 1.1.0',
+                'version' => 'Versi 1.1.0 (Pembaruan Sistem Perbankan)',
                 'changes' => [
-                    '[Perbaikan] Format Rupiah pada nominal default di kategori pembayaran.',
-                    '[Pembaruan] Desain antarmuka (UI) menggunakan konsep modern Sidebar responsif.',
-                    '[Pembaruan] Penambahan Dashboard analisis keuangan tingkat lanjut.',
-                    '[Pembaruan] Implementasi notifikasi berbasis SweetAlert2.',
-                    '[Pembaruan] Fitur Backup Database dan Cek Pembaruan.',
+                    '[Pembaruan] Modul Layanan Teller terintegrasi untuk Setor dan Tarik Tunai.',
+                    '[Pembaruan] Fitur cetak Struk/Nota transaksi otomatis (Mendukung Printer Thermal).',
+                    '[Pembaruan] Dashboard analitik keuangan perbankan secara realtime.',
+                    '[Perbaikan] Penyesuaian antarmuka untuk pencatatan Buku Kas Umum.',
+                    '[Pembaruan] Pemisahan struktur database dari sistem keuangan akademik (Simaku).'
                 ]
             ],
             [
-                'version' => 'Versi 1.0.0',
+                'version' => 'Versi 1.0.0 (Rilis Awal Bank Mini)',
                 'changes' => [
-                    '[Pembaruan] Rilis awal aplikasi BANKMINI.',
-                    '[Pembaruan] Fitur manajemen master data: Kelas, Jurusan, Siswa.',
-                    '[Pembaruan] Fitur manajemen kategori pemasukan dan pengeluaran.',
-                    '[Pembaruan] Sistem login dan otentikasi admin sekolah.'
+                    '[Pembaruan] Rilis awal Sistem Informasi Bank Mini Sekolah.',
+                    '[Pembaruan] Fitur manajemen master data: Kelas, Jurusan, Nasabah (Siswa/Umum).',
+                    '[Pembaruan] Sistem login dan otentikasi petugas/teller.',
+                    '[Pembaruan] Fitur Backup Database dan Pembaruan Otomatis.'
                 ]
             ]
         ];
