@@ -56,7 +56,12 @@ Route::middleware('auth')->group(function () {
 require __DIR__.'/auth.php';
 
 Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('majors/template', [\App\Http\Controllers\MajorController::class, 'template'])->name('majors.template');
+    Route::post('majors/import', [\App\Http\Controllers\MajorController::class, 'import'])->name('majors.import');
     Route::resource('majors', \App\Http\Controllers\MajorController::class);
+    
+    Route::get('classrooms/template', [\App\Http\Controllers\ClassroomController::class, 'template'])->name('classrooms.template');
+    Route::post('classrooms/import', [\App\Http\Controllers\ClassroomController::class, 'import'])->name('classrooms.import');
     Route::resource('classrooms', \App\Http\Controllers\ClassroomController::class);
     Route::get('students/template', [\App\Http\Controllers\StudentController::class, 'template'])->name('students.template');
     Route::post('students/import', [\App\Http\Controllers\StudentController::class, 'import'])->name('students.import');
@@ -121,6 +126,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/reports/classrooms', [\App\Http\Controllers\ReportController::class, 'classrooms'])->name('reports.classrooms');
     Route::get('/reports/classrooms/{id}', [\App\Http\Controllers\ReportController::class, 'classroomDetail'])->name('reports.classroom.detail');
     Route::get('/reports/classrooms/{id}/pdf', [\App\Http\Controllers\ReportController::class, 'printClassroomPdf'])->name('reports.classroom.pdf');
+    Route::get('/reports/classrooms/{id}/students/pdf', [\App\Http\Controllers\ReportController::class, 'printClassroomStudentsPdf'])->name('reports.classroom-students.pdf');
     Route::get('/reports/students/{id}/pdf', [\App\Http\Controllers\ReportController::class, 'printStudentPdf'])->name('reports.student.pdf');
     Route::get('/reports/bku/pdf', [\App\Http\Controllers\ReportController::class, 'printBkuPdf'])->name('reports.bku.pdf');
 });

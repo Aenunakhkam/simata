@@ -105,6 +105,17 @@ class ReportController extends Controller
         return $pdf->download("laporan_kelas_{$classroom->level}_{$classroom->name}.pdf");
     }
 
+    public function printClassroomStudentsPdf($id)
+    {
+        $classroom = Classroom::with(['major'])->findOrFail($id);
+        $students = $classroom->students()->orderBy('name', 'asc')->get();
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.classroom_students_report', compact('classroom', 'students'))
+            ->setPaper('a4', 'landscape');
+        
+        return $pdf->download("daftar_siswa_kelas_{$classroom->level}_{$classroom->name}.pdf");
+    }
+
     public function printStudentPdf($id)
     {
         $student = \App\Models\Student::with(['classroom.major'])->findOrFail($id);

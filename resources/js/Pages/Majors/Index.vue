@@ -17,11 +17,16 @@ const props = defineProps({
 
 const isCreateModalOpen = ref(false);
 const isEditModalOpen = ref(false);
+const isImportModalOpen = ref(false);
 const editingMajor = ref(null);
 
 const form = useForm({
     code: '',
     name: '',
+});
+
+const importForm = useForm({
+    file: null,
 });
 
 const openCreateModal = () => {
@@ -43,6 +48,18 @@ const closeModals = () => {
     form.clearErrors();
 };
 
+const openImportModal = () => {
+    importForm.reset();
+    importForm.clearErrors();
+    isImportModalOpen.value = true;
+};
+
+const closeImportModal = () => {
+    isImportModalOpen.value = false;
+    importForm.reset();
+    importForm.clearErrors();
+};
+
 const storeMajor = () => {
     form.post(route('majors.store'), {
         onSuccess: () => closeModals(),
@@ -52,6 +69,12 @@ const storeMajor = () => {
 const updateMajor = () => {
     form.put(route('majors.update', editingMajor.value.id), {
         onSuccess: () => closeModals(),
+    });
+};
+
+const importData = () => {
+    importForm.post(route('majors.import'), {
+        onSuccess: () => closeImportModal(),
     });
 };
 
@@ -121,6 +144,9 @@ const onSearch = () => {
                                     placeholder="Cari kode atau nama jurusan..." 
                                 />
                             </div>
+                            <button @click="openImportModal" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-xl font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150 shadow-md hover:shadow-lg whitespace-nowrap">
+                                Import Excel
+                            </button>
                             <PrimaryButton @click="openCreateModal" class="shadow-md hover:shadow-lg transition-all rounded-xl whitespace-nowrap">
                                 + Tambah Jurusan
                             </PrimaryButton>
@@ -207,6 +233,40 @@ const onSearch = () => {
                         <SecondaryButton @click="closeModals">Batal</SecondaryButton>
                         <PrimaryButton :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
                             Simpan Data
+                        </PrimaryButton>
+                    </div>
+                </form>
+            </div>
+        </Modal>
+
+        <!-- Import Modal -->
+        <Modal :show="isImportModalOpen" @close="closeImportModal">
+            <div class="bg-gradient-to-b from-indigo-50/50 to-white px-6 py-5 border-b border-gray-100">
+                <h2 class="text-xl font-bold text-indigo-700 flex items-center">
+                    <svg class="w-6 h-6 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                    Import Data Jurusan
+                </h2>
+            </div>
+            <div class="p-6 sm:p-8">
+                <form @submit.prevent="importData">
+                    <div class="mb-4">
+                        <p class="text-sm text-gray-600 mb-4">
+                            Silakan unduh template Excel terlebih dahulu, isi data sesuai format, lalu unggah kembali.
+                        </p>
+                        <a :href="route('majors.template')" target="_blank" class="inline-flex items-center text-sm text-indigo-600 hover:text-indigo-900 font-medium mb-4">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                            Unduh Template Excel
+                        </a>
+                        
+                        <InputLabel for="file" value="Pilih File Excel (.xlsx)" />
+                        <input type="file" id="file" @change="e => importForm.file = e.target.files[0]" accept=".xlsx, .xls" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" required />
+                        <InputError :message="importForm.errors.file" class="mt-2" />
+                    </div>
+
+                    <div class="flex justify-end space-x-3 pt-4 border-t border-gray-100">
+                        <SecondaryButton @click="closeImportModal">Batal</SecondaryButton>
+                        <PrimaryButton :class="{ 'opacity-25': importForm.processing }" :disabled="importForm.processing">
+                            Upload & Import
                         </PrimaryButton>
                     </div>
                 </form>

@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue';
-import { useForm, Head } from '@inertiajs/vue3';
+import { useForm, Head, Link } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue';
@@ -17,12 +17,19 @@ const props = defineProps({
 
 const isCreateModalOpen = ref(false);
 const isEditModalOpen = ref(false);
+const isImportModalOpen = ref(false);
+const isStudentsModalOpen = ref(false);
 const editingClassroom = ref(null);
+const selectedClassroomForStudents = ref(null);
 
 const form = useForm({
     major_id: '',
     level: '',
     name: '',
+});
+
+const importForm = useForm({
+    file: null,
 });
 
 const openCreateModal = () => {
@@ -45,6 +52,28 @@ const closeModals = () => {
     form.clearErrors();
 };
 
+const openImportModal = () => {
+    importForm.reset();
+    importForm.clearErrors();
+    isImportModalOpen.value = true;
+};
+
+const closeImportModal = () => {
+    isImportModalOpen.value = false;
+    importForm.reset();
+    importForm.clearErrors();
+};
+
+const openStudentsModal = (classroom) => {
+    selectedClassroomForStudents.value = classroom;
+    isStudentsModalOpen.value = true;
+};
+
+const closeStudentsModal = () => {
+    isStudentsModalOpen.value = false;
+    selectedClassroomForStudents.value = null;
+};
+
 const storeClassroom = () => {
     form.post(route('classrooms.store'), {
         onSuccess: () => closeModals(),
@@ -54,6 +83,12 @@ const storeClassroom = () => {
 const updateClassroom = () => {
     form.put(route('classrooms.update', editingClassroom.value.id), {
         onSuccess: () => closeModals(),
+    });
+};
+
+const importData = () => {
+    importForm.post(route('classrooms.import'), {
+        onSuccess: () => closeImportModal(),
     });
 };
 
@@ -112,6 +147,9 @@ const onSearch = () => {
                                     placeholder="Cari kelas atau jurusan..." 
                                 />
                             </div>
+                            <button @click="openImportModal" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-xl font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150 shadow-md hover:shadow-lg whitespace-nowrap">
+                                Import Excel
+                            </button>
                             <PrimaryButton @click="openCreateModal" class="shadow-md hover:shadow-lg transition-all rounded-xl whitespace-nowrap">
                                 + Tambah Kelas
                             </PrimaryButton>
@@ -142,6 +180,9 @@ const onSearch = () => {
                                         </span>
                                     </td>
                                     <td class="px-6 py-4 text-right space-x-2">
+                                        <button @click="openStudentsModal(classroom)" class="inline-flex items-center justify-center text-green-600 hover:text-green-900 bg-green-50 hover:bg-green-100 p-2 rounded-lg transition-colors" title="Lihat Anggota Siswa">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                                        </button>
                                         <button @click="openEditModal(classroom)" class="inline-flex items-center justify-center text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 p-2 rounded-lg transition-colors" title="Edit">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                                         </button>
@@ -223,6 +264,95 @@ const onSearch = () => {
                         </PrimaryButton>
                     </div>
                 </form>
+            </div>
+        </Modal>
+
+        <!-- Import Modal -->
+        <Modal :show="isImportModalOpen" @close="closeImportModal">
+            <div class="bg-gradient-to-b from-indigo-50/50 to-white px-6 py-5 border-b border-gray-100">
+                <h2 class="text-xl font-bold text-indigo-700 flex items-center">
+                    <svg class="w-6 h-6 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                    Import Data Kelas
+                </h2>
+            </div>
+            <div class="p-6 sm:p-8">
+                <form @submit.prevent="importData">
+                    <div class="mb-4">
+                        <p class="text-sm text-gray-600 mb-4">
+                            Silakan unduh template Excel terlebih dahulu, isi data sesuai format, lalu unggah kembali.
+                        </p>
+                        <a :href="route('classrooms.template')" target="_blank" class="inline-flex items-center text-sm text-indigo-600 hover:text-indigo-900 font-medium mb-4">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                            Unduh Template Excel
+                        </a>
+                        
+                        <InputLabel for="file" value="Pilih File Excel (.xlsx)" />
+                        <input type="file" id="file" @change="e => importForm.file = e.target.files[0]" accept=".xlsx, .xls" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" required />
+                        <InputError :message="importForm.errors.file" class="mt-2" />
+                    </div>
+
+                    <div class="flex justify-end space-x-3 pt-4 border-t border-gray-100">
+                        <SecondaryButton @click="closeImportModal">Batal</SecondaryButton>
+                        <PrimaryButton :class="{ 'opacity-25': importForm.processing }" :disabled="importForm.processing">
+                            Upload & Import
+                        </PrimaryButton>
+                    </div>
+                </form>
+            </div>
+        </Modal>
+
+        <!-- Students Modal -->
+        <Modal :show="isStudentsModalOpen" @close="closeStudentsModal" maxWidth="2xl">
+            <div class="bg-gradient-to-b from-green-50/50 to-white px-6 py-5 border-b border-gray-100 flex justify-between items-center">
+                <h2 class="text-xl font-bold text-[#0f7632] flex items-center">
+                    <svg class="w-6 h-6 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                    Anggota Kelas {{ selectedClassroomForStudents?.name }}
+                </h2>
+                <a 
+                    v-if="selectedClassroomForStudents" 
+                    :href="route('reports.classroom-students.pdf', selectedClassroomForStudents.id)" 
+                    target="_blank" 
+                    class="inline-flex items-center px-4 py-2 bg-red-600 border border-transparent rounded-xl font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700 focus:bg-red-700 active:bg-red-900 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition ease-in-out duration-150 shadow-md"
+                >
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    Export PDF
+                </a>
+            </div>
+            <div class="p-6">
+                <div class="overflow-y-auto max-h-[40vh] pr-2">
+                    <table class="w-full text-sm text-left text-gray-500 border border-gray-100 rounded-lg overflow-hidden">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-50 sticky top-0">
+                            <tr>
+                                <th class="px-4 py-3 font-bold text-center w-12 border-b">No</th>
+                                <th class="px-4 py-3 font-bold border-b">NISN / NIS</th>
+                                <th class="px-4 py-3 font-bold border-b">Nama Lengkap</th>
+                                <th class="px-4 py-3 font-bold border-b text-center">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(student, idx) in selectedClassroomForStudents?.students || []" :key="student.id" class="bg-white border-b hover:bg-gray-50">
+                                <td class="px-4 py-3 text-center text-gray-500">{{ idx + 1 }}</td>
+                                <td class="px-4 py-3">
+                                    <div class="font-medium text-gray-900">{{ student.nisn }}</div>
+                                    <div class="text-xs text-gray-500">{{ student.nis || '-' }}</div>
+                                </td>
+                                <td class="px-4 py-3 font-medium text-gray-900">{{ student.name }}</td>
+                                <td class="px-4 py-3 text-center">
+                                    <span v-if="student.status === 'active'" class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-medium">Aktif</span>
+                                    <span v-else-if="student.status === 'graduated'" class="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-medium">Lulus</span>
+                                    <span v-else class="px-2 py-1 bg-red-100 text-red-700 rounded text-xs font-medium">Keluar</span>
+                                </td>
+                            </tr>
+                            <tr v-if="!selectedClassroomForStudents?.students || selectedClassroomForStudents.students.length === 0">
+                                <td colspan="4" class="px-4 py-6 text-center text-gray-500 italic bg-gray-50/50">Tidak ada data siswa di kelas ini.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="flex justify-end pt-4 mt-4 border-t border-gray-100">
+                    <SecondaryButton @click="closeStudentsModal">Tutup</SecondaryButton>
+                </div>
             </div>
         </Modal>
     </AuthenticatedLayout>

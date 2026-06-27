@@ -6,6 +6,8 @@ use App\Models\Classroom;
 use App\Models\Major;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Shuchkin\SimpleXLSX;
+use Shuchkin\SimpleXLSXGen;
 
 class ClassroomController extends Controller
 {
@@ -14,7 +16,9 @@ class ClassroomController extends Controller
         $perPage = $request->input('per_page', 10);
         $search = $request->input('search');
 
-        $query = Classroom::with('major')
+        $query = Classroom::with(['major', 'students' => function ($q) {
+            $q->orderBy('name', 'asc');
+        }])
             ->when($search, function ($query, $search) {
                 $query->where('name', 'ilike', "%{$search}%")
                       ->orWhereHas('major', function ($q) use ($search) {
@@ -69,5 +73,58 @@ class ClassroomController extends Controller
         $classroom->delete();
 
         return redirect()->back()->with('message', 'Kelas berhasil dihapus.');
+    }
+
+    public function template()
+    {
+        $data = [
+            ['Tingkat (Angka)', 'Nama Kelas', 'Kode Jurusan'],
+            ['10', '10 RPL 1', 'RPL'],
+            ['11', '11 TKJ 2', 'TKJ'],
+        ];
+
+        return SimpleXLSXGen::fromArray($data)->downloadAs('Template_Data_Kelas.xlsx');
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx,xls'
+        ]);
+
+        if ($xlsx = SimpleXLSX::parse($request->file('file')->path())) {
+            $rows = $xlsx->rows();
+            
+            // Skip the header row
+            array_shift($rows);
+
+            $importedCount = 0;
+
+            foreach ($rows as $row) {
+                $level = isset($row[0]) ? trim($row[0]) : '';
+                $name = isset($row[1]) ? trim($row[1]) : '';
+                $majorCode = isset($row[2]) ? trim($row[2]) : '';
+
+                if (empty($level) || empty($name) || empty($majorCode)) continue;
+
+                $major = Major::whereRaw('LOWER(code) = ?', [strtolower($majorCode)])->first();
+                
+                if (!$major) continue;
+
+                Classroom::updateOrCreate(
+                    ['name' => $name],
+                    [
+                        'level' => $level,
+                        'major_id' => $major->id
+                    ]
+                );
+
+                $importedCount++;
+            }
+
+            return redirect()->back()->with('success', "Berhasil mengimpor $importedCount data kelas.");
+        } else {
+            return redirect()->back()->with('error', 'Gagal membaca file Excel. ' . SimpleXLSX::parseError());
+        }
     }
 }

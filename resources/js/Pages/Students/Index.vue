@@ -140,7 +140,8 @@ const deleteStudent = (id) => {
 
 const searchForm = useForm({ 
     search: props.filters?.search || '',
-    per_page: props.filters?.per_page || '10'
+    per_page: props.filters?.per_page || '10',
+    classroom_id: props.filters?.classroom_id || ''
 });
 
 const onSearch = () => {

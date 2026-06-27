@@ -16,12 +16,20 @@ class StudentController extends Controller
         $perPage = $request->input('per_page', 10);
         $search = $request->input('search');
 
+        $classroomId = $request->input('classroom_id');
+
         $query = Student::with('classroom.major')->latest();
 
         if ($search) {
-            $query->where('name', 'ilike', "%{$search}%")
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'ilike', "%{$search}%")
                   ->orWhere('nisn', 'ilike', "%{$search}%")
                   ->orWhere('nis', 'ilike', "%{$search}%");
+            });
+        }
+
+        if ($classroomId) {
+            $query->where('classroom_id', $classroomId);
         }
 
         if ($perPage === 'all') {
@@ -33,7 +41,7 @@ class StudentController extends Controller
         return Inertia::render('Students/Index', [
             'students' => $students->withQueryString(),
             'classrooms' => Classroom::with('major')->orderBy('level')->orderBy('name')->get(),
-            'filters' => $request->only(['search', 'per_page'])
+            'filters' => $request->only(['search', 'per_page', 'classroom_id'])
         ]);
     }
 

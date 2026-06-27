@@ -286,7 +286,7 @@ const chartOptions = {
                         <div>
                             <div class="text-xs font-bold text-gray-400 uppercase tracking-wider">Pengembang Utama</div>
                             <div class="text-sm font-bold mt-1">
-                                <a href="https://github.com/Aenunakhkam" target="_blank" class="text-gray-800 hover:text-indigo-600 hover:underline transition-colors">Aenun Akhkam (GitHub)</a>
+                                <a href="https://github.com/Aenunakhkam" target="_blank" class="text-gray-800 hover:text-indigo-600 hover:underline transition-colors">Aenun Akhkam</a>
                             </div>
                         </div>
                     </div>
