@@ -68,7 +68,7 @@ const submit = () => {
 
 <template>
     <GuestLayout>
-        <Head title="Masuk ke BANKMINI" />
+        <Head title="Login" />
 
         <div class="mb-8">
             <h2 class="text-3xl font-extrabold text-[#0f7632] tracking-tight mb-2">Selamat Datang!</h2>
