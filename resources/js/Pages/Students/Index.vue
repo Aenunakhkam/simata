@@ -115,10 +115,27 @@ const submitImport = () => {
     });
 };
 
+import Swal from 'sweetalert2';
+
 const deleteStudent = (id) => {
-    if (confirm('Apakah Anda yakin ingin menghapus data siswa ini?')) {
-        useForm({}).delete(route('students.destroy', id));
-    }
+    Swal.fire({
+        title: 'Hapus Data Nasabah?',
+        text: 'Apakah Anda yakin ingin menghapus data nasabah ini? Tindakan ini tidak dapat dibatalkan.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Ya, Hapus!',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            useForm({}).delete(route('students.destroy', id), {
+                onSuccess: () => {
+                    Swal.fire('Berhasil!', 'Data nasabah berhasil dihapus.', 'success');
+                }
+            });
+        }
+    });
 };
 
 const searchForm = useForm({ 
