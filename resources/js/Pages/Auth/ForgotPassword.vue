@@ -25,7 +25,7 @@ import { Head, Link } from '@inertiajs/vue3';
                         <li>Buka folder instalasi Simata di komputer server.</li>
                         <li>Cari dan klik dua kali file <code class="font-bold bg-white px-1.5 py-0.5 rounded text-rose-900 shadow-sm border border-rose-100">Reset-Password-Admin.bat</code>.</li>
                         <li>Tekan <kbd class="font-bold bg-white px-1.5 py-0.5 rounded text-rose-900 shadow-sm border border-rose-100">Enter</kbd> pada jendela hitam yang muncul.</li>
-                        <li>Setelah sukses, kata sandi Anda akan kembali menjadi: <code class="font-bold bg-white px-1.5 py-0.5 rounded text-[#7B1113] shadow-sm border border-rose-100">Belajar123*</code></li>
+                        <li>Setelah sukses, kata sandi Anda akan direset.</li>
                     </ol>
                 </div>
             </div>
