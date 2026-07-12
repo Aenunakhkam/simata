@@ -3,7 +3,7 @@
         <th colspan="6" style="text-align: center; font-weight: bold; font-size: 16px;">{{ $title }}</th>
     </tr>
     <tr>
-        <th colspan="6" style="text-align: center;">Aplikasi Bank Mini Sekolah</th>
+        <th colspan="6" style="text-align: center;">Aplikasi SIMATA Sekolah</th>
     </tr>
     <tr>
         <th colspan="6" style="text-align: center;">Periode: {{ $cycleLabel }}</th>

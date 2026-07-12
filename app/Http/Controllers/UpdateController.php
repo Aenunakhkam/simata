@@ -56,20 +56,20 @@ class UpdateController extends Controller
         // Catatan rilis statis untuk tab Aplikasi
         $appUpdates = [
             [
-                'version' => 'Versi 1.1.0 (Pembaruan Sistem Perbankan)',
+                'version' => 'Versi 1.1.0 (Pembaruan Sistem Akademik)',
                 'changes' => [
-                    '[Pembaruan] Modul Layanan Teller terintegrasi untuk Setor dan Tarik Tunai.',
-                    '[Pembaruan] Fitur cetak Struk/Nota transaksi otomatis (Mendukung Printer Thermal).',
-                    '[Pembaruan] Dashboard analitik keuangan perbankan secara realtime.',
-                    '[Perbaikan] Penyesuaian antarmuka untuk pencatatan Buku Kas Umum.'
+                    '[Pembaruan] Modul Manajemen Jadwal & Penempatan Siswa.',
+                    '[Pembaruan] Fitur Rekapitulasi Presensi dan Nilai secara realtime.',
+                    '[Pembaruan] Antarmuka (UI/UX) baru dengan tema Maroon & Gold.',
+                    '[Perbaikan] Penyesuaian antarmuka pada pengelolaan Data Master.'
                 ]
             ],
             [
-                'version' => 'Versi 1.0.0 (Rilis Awal Bank Mini)',
+                'version' => 'Versi 1.0.0 (Rilis Awal SIMATA)',
                 'changes' => [
-                    '[Pembaruan] Rilis awal Sistem Informasi Bank Mini Sekolah.',
-                    '[Pembaruan] Fitur manajemen master data: Kelas, Jurusan, Nasabah (Siswa/Umum).',
-                    '[Pembaruan] Sistem login dan otentikasi petugas/teller.',
+                    '[Pembaruan] Rilis awal Sistem Informasi Manajemen Tata Akademik (SIMATA).',
+                    '[Pembaruan] Fitur manajemen master data: Guru, Siswa, Kelas, Jurusan.',
+                    '[Pembaruan] Sistem login dan otentikasi berdasarkan Role (Admin & Guru).',
                     '[Pembaruan] Fitur Backup Database dan Pembaruan Otomatis.'
                 ]
             ]

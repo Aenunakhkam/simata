@@ -165,7 +165,7 @@
             <div class="clear"></div>
             
             <div class="footer-note">
-                Dicetak oleh Sistem Manajemen Keuangan (BANKMINI) pada {{ date('d/m/Y H:i:s') }}
+                Dicetak oleh Sistem Manajemen Keuangan (SIMATA) pada {{ date('d/m/Y H:i:s') }}
             </div>
         </div>
         

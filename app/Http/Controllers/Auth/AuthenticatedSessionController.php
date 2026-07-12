@@ -18,11 +18,9 @@ class AuthenticatedSessionController extends Controller
      */
     public function create(): Response
     {
-        $academicYears = \App\Models\AcademicYear::orderByDesc('id')->get();
         return Inertia::render('Auth/Login', [
             'canResetPassword' => Route::has('password.request'),
             'status' => session('status'),
-            'academicYears' => $academicYears,
         ]);
     }
 
@@ -34,10 +32,6 @@ class AuthenticatedSessionController extends Controller
         $request->authenticate();
 
         $request->session()->regenerate();
-
-        if ($request->filled('academic_year_id')) {
-            $request->session()->put('academic_year_id', $request->academic_year_id);
-        }
 
         return redirect()->intended(route('dashboard', absolute: false))->with('success', 'Login berhasil!');
     }

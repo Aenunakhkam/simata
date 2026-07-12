@@ -136,7 +136,7 @@ class CatatanKeuanganController extends Controller
             $query->where('type', 'withdrawal');
             $title = 'Laporan Pengeluaran (Penarikan Tunai)';
         } else {
-            $title = 'Laporan Keuangan Bank Mini';
+            $title = 'Laporan Keuangan SIMATA';
         }
 
         $transactions = $query->get();

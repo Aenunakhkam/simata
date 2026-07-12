@@ -36,37 +36,39 @@ const form = useForm({
 
         <form
             @submit.prevent="form.patch(route('profile.update'))"
-            class="mt-6 space-y-6"
+            class="mt-6"
         >
-            <div>
-                <InputLabel for="npsn" value="NPSN Sekolah" />
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div>
+                    <InputLabel for="npsn" value="NPSN Sekolah" />
 
-                <TextInput
-                    id="npsn"
-                    type="text"
-                    class="mt-1 block w-full"
-                    v-model="form.npsn"
-                    required
-                    autofocus
-                    autocomplete="npsn"
-                />
+                    <TextInput
+                        id="npsn"
+                        type="text"
+                        class="mt-1 block w-full"
+                        v-model="form.npsn"
+                        required
+                        autofocus
+                        autocomplete="npsn"
+                    />
 
-                <InputError class="mt-2" :message="form.errors.npsn" />
-            </div>
+                    <InputError class="mt-2" :message="form.errors.npsn" />
+                </div>
 
-            <div>
-                <InputLabel for="email" value="Email" />
+                <div>
+                    <InputLabel for="email" value="Email" />
 
-                <TextInput
-                    id="email"
-                    type="email"
-                    class="mt-1 block w-full"
-                    v-model="form.email"
-                    required
-                    autocomplete="username"
-                />
+                    <TextInput
+                        id="email"
+                        type="email"
+                        class="mt-1 block w-full"
+                        v-model="form.email"
+                        required
+                        autocomplete="username"
+                    />
 
-                <InputError class="mt-2" :message="form.errors.email" />
+                    <InputError class="mt-2" :message="form.errors.email" />
+                </div>
             </div>
 
             <div v-if="mustVerifyEmail && user.email_verified_at === null">

@@ -120,7 +120,7 @@
     </table>
 
     <div style="margin-top: 40px; font-size: 10px; color: #555; font-style: italic; border-top: 1px dashed #ccc; padding-top: 5px;">
-        * Dokumen Buku Kas Umum ini dicetak secara otomatis oleh Sistem Manajemen Keuangan (BANKMINI) pada {{ date('d/m/Y H:i:s') }}.
+        * Dokumen Buku Kas Umum ini dicetak secara otomatis oleh Sistem Manajemen Keuangan (SIMATA) pada {{ date('d/m/Y H:i:s') }}.
     </div>
 
 </body>

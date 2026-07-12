@@ -15,7 +15,6 @@ class StudentController extends Controller
     {
         $perPage = $request->input('per_page', 10);
         $search = $request->input('search');
-
         $classroomId = $request->input('classroom_id');
 
         $query = Student::with('classroom.major')->latest();
@@ -32,11 +31,9 @@ class StudentController extends Controller
             $query->where('classroom_id', $classroomId);
         }
 
-        if ($perPage === 'all') {
-            $students = $query->paginate($query->count() > 0 ? $query->count() : 1);
-        } else {
-            $students = $query->paginate($perPage);
-        }
+        $students = ($perPage === 'all')
+            ? $query->paginate($query->count() > 0 ? $query->count() : 1)
+            : $query->paginate($perPage);
 
         return Inertia::render('Students/Index', [
             'students' => $students->withQueryString(),
@@ -48,17 +45,17 @@ class StudentController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'nisn' => 'required|string|max:20|unique:students',
-            'nis' => 'nullable|string|max:20|unique:students',
+            'nisn' => 'required|string|max:20|unique:students,nisn',
+            'nis' => 'nullable|string|max:20|unique:students,nis',
             'name' => 'required|string|max:255',
-            'nasabah_type' => 'required|in:Siswa,Guru,Staf,Lainnya',
+            'gender' => 'required|in:L,P',
             'classroom_id' => 'nullable|exists:classrooms,id',
             'status' => 'required|in:active,graduated,dropped_out',
         ]);
 
-        Student::create($validated);
+        Student::create(array_merge($validated, ['nasabah_type' => 'Siswa']));
 
-        return redirect()->back()->with('message', 'Data nasabah berhasil ditambahkan.');
+        return redirect()->back()->with('success', 'Data siswa berhasil ditambahkan.');
     }
 
     public function update(Request $request, Student $student)
@@ -67,32 +64,32 @@ class StudentController extends Controller
             'nisn' => 'required|string|max:20|unique:students,nisn,' . $student->id,
             'nis' => 'nullable|string|max:20|unique:students,nis,' . $student->id,
             'name' => 'required|string|max:255',
-            'nasabah_type' => 'required|in:Siswa,Guru,Staf,Lainnya',
+            'gender' => 'required|in:L,P',
             'classroom_id' => 'nullable|exists:classrooms,id',
             'status' => 'required|in:active,graduated,dropped_out',
         ]);
 
         $student->update($validated);
 
-        return redirect()->back()->with('message', 'Data nasabah berhasil diperbarui.');
+        return redirect()->back()->with('success', 'Data siswa berhasil diperbarui.');
     }
 
     public function destroy(Student $student)
     {
         $student->delete();
 
-        return redirect()->route('students.index')->with('success', 'Siswa berhasil dihapus.');
+        return redirect()->back()->with('success', 'Data siswa berhasil dihapus.');
     }
 
     public function template()
     {
         $data = [
-            ['Nomor Rekening / NISN', 'NIP / NIS', 'Nama Lengkap', 'Kategori Nasabah', 'Nama Kelas (Khusus Siswa)', 'Status'],
-            ['0012345678', '1001', 'Ahmad Dani', 'Siswa', '10 RPL 1', 'Aktif'],
-            ['88812345', '19800101', 'Budi Santoso', 'Guru', '', 'Aktif'],
+            ['NISN', 'NIS', 'Nama Lengkap', 'Jenis Kelamin (L/P)', 'Nama Kelas', 'Status (Aktif/Lulus/Keluar)'],
+            ['0012345678', '1001', 'Ahmad Dani', 'L', '10 RPL 1', 'Aktif'],
+            ['0012345679', '1002', 'Siti Rahma', 'P', '11 TKJ 1', 'Aktif'],
         ];
 
-        return SimpleXLSXGen::fromArray($data)->downloadAs('Template_Data_Nasabah.xlsx');
+        return SimpleXLSXGen::fromArray($data)->downloadAs('Template_Impor_Siswa.xlsx');
     }
 
     public function import(Request $request)
@@ -110,15 +107,11 @@ class StudentController extends Controller
             $importedCount = 0;
 
             foreach ($rows as $row) {
-                $nisn = isset($row[0]) ? trim($row[0]) : ''; // Nomor Rekening
-                $nis = isset($row[1]) ? trim($row[1]) : '';  // NIP / NIS
-                $name = isset($row[2]) ? trim($row[2]) : ''; // Nama Lengkap
-                
-                // Kategori Nasabah
-                $rawType = isset($row[3]) && trim($row[3]) !== '' ? ucwords(strtolower(trim($row[3]))) : 'Siswa';
-                $validTypes = ['Siswa', 'Guru', 'Staf', 'Lainnya'];
-                $nasabahType = in_array($rawType, $validTypes) ? $rawType : 'Siswa';
-
+                $nisn = isset($row[0]) ? trim($row[0]) : '';
+                $nis = isset($row[1]) ? trim($row[1]) : '';
+                $name = isset($row[2]) ? trim($row[2]) : '';
+                $genderRaw = isset($row[3]) ? strtoupper(trim($row[3])) : 'L';
+                $gender = in_array($genderRaw, ['L', 'P']) ? $genderRaw : 'L';
                 $className = isset($row[4]) ? trim($row[4]) : '';
                 
                 $statusRaw = isset($row[5]) && trim($row[5]) !== '' ? strtolower(trim($row[5])) : 'aktif';
@@ -132,49 +125,73 @@ class StudentController extends Controller
 
                 if (empty($nisn) || empty($name)) continue;
 
-                $nis = $nis === '' ? null : $nis;
-
                 $classroomId = null;
-                // Hanya cari kelas jika kategorinya Siswa
-                if ($nasabahType === 'Siswa' && !empty($className)) {
+                if (!empty($className)) {
                     $classroom = Classroom::whereRaw('LOWER(name) = ?', [strtolower($className)])->first();
                     if ($classroom) {
                         $classroomId = $classroom->id;
                     }
                 }
 
-                // Create or Update student based on NISN (No Rekening)
+                // Create or Update student based on NISN
                 Student::updateOrCreate(
                     ['nisn' => $nisn],
                     [
-                        'nis' => $nis,
+                        'nis' => $nis === '' ? null : $nis,
                         'name' => $name,
-                        'nasabah_type' => $nasabahType,
+                        'gender' => $gender,
                         'classroom_id' => $classroomId,
-                        'status' => $status
+                        'status' => $status,
+                        'nasabah_type' => 'Siswa'
                     ]
                 );
 
                 $importedCount++;
             }
 
-            return redirect()->route('students.index')->with('success', "Berhasil mengimpor $importedCount data nasabah.");
+            return redirect()->back()->with('success', "Berhasil mengimpor $importedCount data siswa.");
         } else {
-            return redirect()->route('students.index')->with('error', 'Gagal membaca file Excel. ' . SimpleXLSX::parseError());
+            return redirect()->back()->with('error', 'Gagal membaca file Excel: ' . SimpleXLSX::parseError());
         }
     }
-    public function bulkUpdateClass(Request $request)
+
+    public function export(Request $request)
     {
-        $request->validate([
-            'student_ids' => 'required|array',
-            'student_ids.*' => 'exists:students,id',
-            'classroom_id' => 'required|exists:classrooms,id',
-        ]);
+        $classroomId = $request->input('classroom_id');
+        $query = Student::with('classroom.major')->orderBy('name');
 
-        Student::whereIn('id', $request->student_ids)->update([
-            'classroom_id' => $request->classroom_id
-        ]);
+        if ($classroomId) {
+            $query->where('classroom_id', $classroomId);
+        }
 
-        return redirect()->back()->with('success', count($request->student_ids) . ' siswa berhasil dipindahkan kelasnya.');
+        $students = $query->get();
+
+        $data = [
+            ['No', 'NISN', 'NIS', 'Nama Lengkap', 'Jenis Kelamin', 'Kelas', 'Status']
+        ];
+
+        foreach ($students as $index => $s) {
+            $statusLabel = 'Aktif';
+            if ($s->status === 'graduated') $statusLabel = 'Lulus';
+            if ($s->status === 'dropped_out') $statusLabel = 'Keluar';
+
+            $data[] = [
+                $index + 1,
+                $s->nisn,
+                $s->nis ?? '-',
+                $s->name,
+                $s->gender === 'L' ? 'Laki-laki' : 'Perempuan',
+                $s->classroom->name ?? '-',
+                $statusLabel
+            ];
+        }
+
+        $filename = 'Data_Siswa_';
+        if ($classroomId && $students->count() > 0) {
+            $filename .= str_replace(' ', '_', $students->first()->classroom->name) . '_';
+        }
+        $filename .= date('Ymd_His') . '.xlsx';
+
+        return SimpleXLSXGen::fromArray($data)->downloadAs($filename);
     }
 }

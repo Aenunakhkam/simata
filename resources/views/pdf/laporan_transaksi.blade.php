@@ -99,7 +99,7 @@
     <footer>
         <table width="100%" style="border: none;">
             <tr>
-                <td style="border: none; text-align: left;">Dicetak oleh Sistem Bank Mini ({{ \Carbon\Carbon::now()->format('d/m/Y H:i') }})</td>
+                <td style="border: none; text-align: left;">Dicetak oleh Sistem SIMATA ({{ \Carbon\Carbon::now()->format('d/m/Y H:i') }})</td>
                 <td style="border: none; text-align: right;">Halaman <span class="pagenum"></span></td>
             </tr>
         </table>
@@ -107,7 +107,7 @@
 
     <div class="header">
         <h1>{{ $title }}</h1>
-        <p>Aplikasi Bank Mini Sekolah</p>
+        <p>Aplikasi SIMATA Sekolah</p>
         <p>Periode: {{ $cycleLabel }}</p>
     </div>
 

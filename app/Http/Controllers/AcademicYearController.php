@@ -27,14 +27,14 @@ class AcademicYearController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:academic_years',
+            'name' => 'required|string|max:255',
+            'semester' => 'required|string|in:Ganjil,Genap',
             'is_active' => 'boolean',
         ]);
 
         if ($request->is_active) {
             AcademicYear::where('is_active', true)->update(['is_active' => false]);
         } else {
-            // Default to false if not provided, but ensure at least one active exists?
             $validated['is_active'] = false;
         }
 
@@ -46,7 +46,8 @@ class AcademicYearController extends Controller
     public function update(Request $request, AcademicYear $academicYear)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:academic_years,name,' . $academicYear->id,
+            'name' => 'required|string|max:255',
+            'semester' => 'required|string|in:Ganjil,Genap',
             'is_active' => 'boolean',
         ]);
 

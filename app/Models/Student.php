@@ -2,45 +2,20 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Student extends Model
 {
-    use HasFactory;
+    protected $fillable = ['user_id', 'nisn', 'nis', 'name', 'classroom_id', 'gender', 'status', 'nasabah_type'];
 
-    protected $fillable = [
-        'nisn',
-        'nis',
-        'name',
-        'nasabah_type',
-        'classroom_id',
-        'status',
-        'balance'
-    ];
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
 
-    public function classroom()
+    public function classroom(): BelongsTo
     {
         return $this->belongsTo(Classroom::class);
-    }
-
-    public function transactions()
-    {
-        return $this->hasMany(Transaction::class);
-    }
-
-    public function billings()
-    {
-        return $this->hasMany(Billing::class);
-    }
-
-    public function paymentDetails()
-    {
-        return $this->hasManyThrough(PaymentDetail::class, Billing::class);
-    }
-
-    public function payments()
-    {
-        return $this->hasMany(Payment::class);
     }
 }

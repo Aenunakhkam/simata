@@ -1,107 +1,111 @@
 <script setup>
-import { ref } from 'vue';
-import { useForm, Head } from '@inertiajs/vue3';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import PrimaryButton from '@/Components/PrimaryButton.vue';
-import SecondaryButton from '@/Components/SecondaryButton.vue';
-import TextInput from '@/Components/TextInput.vue';
-import InputLabel from '@/Components/InputLabel.vue';
-import InputError from '@/Components/InputError.vue';
-import Modal from '@/Components/Modal.vue';
-import Swal from 'sweetalert2';
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import { Head, useForm, router } from "@inertiajs/vue3";
+import { ref } from "vue";
+import Swal from "sweetalert2";
 
 const props = defineProps({
     majors: Object,
     filters: Object,
 });
 
-const isCreateModalOpen = ref(false);
-const isEditModalOpen = ref(false);
-const isImportModalOpen = ref(false);
-const editingMajor = ref(null);
+const search = ref(props.filters.search || "");
+const perPage = ref(props.filters.per_page || "10");
 
-const form = useForm({
-    code: '',
-    name: '',
+const showAddModal = ref(false);
+const showEditModal = ref(false);
+const showImportModal = ref(false);
+const activeMajor = ref(null);
+
+const addForm = useForm({
+    code: "",
+    name: "",
+});
+
+const editForm = useForm({
+    code: "",
+    name: "",
 });
 
 const importForm = useForm({
     file: null,
 });
 
-const openCreateModal = () => {
-    form.reset();
-    isCreateModalOpen.value = true;
+const handleSearch = () => {
+    router.get(
+        route("majors.index"),
+        { search: search.value, per_page: perPage.value },
+        { preserveState: true, replace: true }
+    );
+};
+
+const handlePerPageChange = () => {
+    handleSearch();
+};
+
+const openAddModal = () => {
+    addForm.reset();
+    showAddModal.value = true;
+};
+
+const submitAdd = () => {
+    addForm.post(route("majors.store"), {
+        onSuccess: () => {
+            showAddModal.value = false;
+            addForm.reset();
+        },
+    });
 };
 
 const openEditModal = (major) => {
-    editingMajor.value = major;
-    form.code = major.code;
-    form.name = major.name;
-    isEditModalOpen.value = true;
+    activeMajor.value = major;
+    editForm.code = major.code;
+    editForm.name = major.name;
+    showEditModal.value = true;
 };
 
-const closeModals = () => {
-    isCreateModalOpen.value = false;
-    isEditModalOpen.value = false;
-    form.reset();
-    form.clearErrors();
-};
-
-const openImportModal = () => {
-    importForm.reset();
-    importForm.clearErrors();
-    isImportModalOpen.value = true;
-};
-
-const closeImportModal = () => {
-    isImportModalOpen.value = false;
-    importForm.reset();
-    importForm.clearErrors();
-};
-
-const storeMajor = () => {
-    form.post(route('majors.store'), {
-        onSuccess: () => closeModals(),
+const submitEdit = () => {
+    editForm.put(route("majors.update", activeMajor.value.id), {
+        onSuccess: () => {
+            showEditModal.value = false;
+            activeMajor.value = null;
+        },
     });
 };
 
-const updateMajor = () => {
-    form.put(route('majors.update', editingMajor.value.id), {
-        onSuccess: () => closeModals(),
-    });
-};
-
-const importData = () => {
-    importForm.post(route('majors.import'), {
-        onSuccess: () => closeImportModal(),
-    });
-};
-
-const deleteMajor = (id) => {
+const deleteMajor = (major) => {
     Swal.fire({
-        title: 'Hapus Data Jurusan?',
-        text: "Data ini tidak dapat dikembalikan setelah dihapus!",
-        icon: 'warning',
+        title: "Apakah Anda yakin?",
+        text: `Data jurusan "${major.name}" akan dihapus permanen!`,
+        icon: "warning",
         showCancelButton: true,
-        confirmButtonColor: '#ef4444',
-        cancelButtonColor: '#6b7280',
-        confirmButtonText: 'Ya, hapus!',
-        cancelButtonText: 'Batal'
+        confirmButtonColor: "#6366f1",
+        cancelButtonColor: "#f43f5e",
+        confirmButtonText: "Ya, hapus!",
+        cancelButtonText: "Batal",
     }).then((result) => {
         if (result.isConfirmed) {
-            useForm({}).delete(route('majors.destroy', id));
+            router.delete(route("majors.destroy", major.id));
         }
     });
 };
 
-const searchForm = useForm({ 
-    search: props.filters?.search || '',
-    per_page: props.filters?.per_page || '10'
-});
+const handleFileSelect = (event) => {
+    importForm.file = event.target.files[0];
+};
 
-const onSearch = () => {
-    searchForm.get(route('majors.index'), { preserveState: true });
+const submitImport = () => {
+    if (!importForm.file) {
+        Swal.fire("Peringatan", "Harap pilih file terlebih dahulu", "warning");
+        return;
+    }
+
+    importForm.post(route("majors.import"), {
+        onSuccess: () => {
+            showImportModal.value = false;
+            importForm.reset();
+        },
+    });
 };
 </script>
 
@@ -109,168 +113,205 @@ const onSearch = () => {
     <Head title="Data Jurusan" />
 
     <AuthenticatedLayout>
-        <template #header>
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">Data Jurusan</h2>
-        </template>
+        <template #header> Data Jurusan </template>
 
-        <div class="py-12">
-            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                <!-- Data Table Container -->
-                <div class="bg-white overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.04)] sm:rounded-2xl border border-gray-100">
-                    <div class="p-6 md:px-8 border-b border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4">
-                        <div class="flex items-center space-x-3 w-full md:w-auto">
-                            <span class="text-sm font-medium text-gray-500">Tampilkan</span>
-                            <select v-model="searchForm.per_page" @change="onSearch" class="border-gray-200 rounded-lg text-sm text-gray-700 focus:ring-green-600 focus:border-green-600">
-                                <option value="10">10</option>
-                                <option value="15">15</option>
-                                <option value="25">25</option>
-                                <option value="50">50</option>
-                                <option value="100">100</option>
-                                <option value="all">Semua</option>
-                            </select>
-                            <span class="text-sm font-medium text-gray-500">data</span>
-                        </div>
-                        
-                        <div class="flex items-center space-x-3 w-full md:w-auto">
-                            <div class="relative w-full md:w-64">
-                                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                                    <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                                </div>
-                                <TextInput 
-                                    v-model="searchForm.search" 
-                                    @keyup.enter="onSearch"
-                                    type="text" 
-                                    class="w-full pl-10 pr-4 py-2 rounded-xl border-gray-200 focus:ring-green-600 focus:border-green-600 bg-gray-50 focus:bg-white transition-colors text-sm" 
-                                    placeholder="Cari kode atau nama jurusan..." 
-                                />
-                            </div>
-                            <button @click="openImportModal" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-xl font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150 shadow-md hover:shadow-lg whitespace-nowrap">
-                                Import Excel
-                            </button>
-                            <PrimaryButton @click="openCreateModal" class="shadow-md hover:shadow-lg transition-all rounded-xl whitespace-nowrap">
-                                + Tambah Jurusan
-                            </PrimaryButton>
-                        </div>
+        <div class="space-y-6 max-w-7xl mx-auto">
+            <!-- Table Action Header -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-3xl border border-slate-100 shadow-sm">
+                <!-- Search bar -->
+                <div class="relative max-w-md w-full">
+                    <input
+                        type="text"
+                        v-model="search"
+                        @keyup.enter="handleSearch"
+                        placeholder="Cari kode atau nama jurusan..."
+                        class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 focus:bg-white focus:ring-4 focus:ring-[#7B1113]/10 focus:border-[#7B1113] rounded-2xl text-sm font-medium placeholder-slate-400 transition-all duration-200"
+                    />
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                     </div>
+                </div>
 
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-sm text-left text-gray-500">
-                            <thead class="text-xs text-gray-500 uppercase tracking-wider bg-gray-50/80 border-b border-gray-100">
-                                <tr>
-                                    <th class="px-6 py-4 font-bold text-center w-12">No</th>
-                                    <th class="px-6 py-4 font-bold">Kode Jurusan</th>
-                                    <th class="px-6 py-4 font-bold">Nama Jurusan</th>
-                                    <th class="px-6 py-4 text-right font-bold">Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-for="(major, index) in majors.data" :key="major.id" class="bg-white border-b last:border-0 hover:bg-green-50/30 transition-colors">
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-500">
-                                        {{ (majors.current_page - 1) * majors.per_page + index + 1 }}
-                                    </td>
-                                    <td class="px-6 py-4 font-medium text-gray-900">{{ major.code }}</td>
-                                    <td class="px-6 py-4">{{ major.name }}</td>
-                                    <td class="px-6 py-4 text-right space-x-2">
-                                        <button @click="openEditModal(major)" class="inline-flex items-center justify-center text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 p-2 rounded-lg transition-colors" title="Edit">
+                <!-- Add/Import actions -->
+                <div class="flex items-center gap-2">
+                    <button @click="openAddModal" class="inline-flex items-center justify-center px-4 py-2.5 bg-[#7B1113] hover:bg-[#5A0D0E] active:scale-95 text-xs font-bold text-white rounded-2xl shadow-lg shadow-[#7B1113]/15 transition-all duration-200">
+                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
+                        Tambah Jurusan
+                    </button>
+                    <button @click="showImportModal = true" class="inline-flex items-center justify-center px-4 py-2.5 bg-slate-100 hover:bg-slate-200/80 active:scale-95 text-xs font-bold text-slate-700 rounded-2xl transition-all duration-200 border border-slate-200/40">
+                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                        Import Excel
+                    </button>
+                </div>
+            </div>
+
+            <!-- Table Card -->
+            <div class="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 border-b border-slate-100 text-slate-400 text-[10px] font-bold uppercase tracking-wider">
+                                <th class="py-4 px-6 w-20 text-center">No</th>
+                                <th class="py-4 px-6 w-44">Kode Jurusan</th>
+                                <th class="py-4 px-6">Nama Program Keahlian</th>
+                                <th class="py-4 px-6 w-36 text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-50 text-slate-700 text-sm">
+                            <tr v-for="(major, index) in majors.data" :key="major.id" class="hover:bg-slate-50/50 transition-colors">
+                                <td class="py-4 px-6 text-center font-semibold text-slate-400">
+                                    {{ (majors.current_page - 1) * majors.per_page + index + 1 }}
+                                </td>
+                                <td class="py-4 px-6 font-bold text-slate-800">
+                                    <span class="px-2.5 py-1 bg-[#7B1113]/10 border border-indigo-100/60 rounded-lg text-[#5A0D0E] text-xs font-black">{{ major.code }}</span>
+                                </td>
+                                <td class="py-4 px-6 font-semibold">{{ major.name }}</td>
+                                <td class="py-4 px-6 text-center">
+                                    <div class="flex items-center justify-center gap-1.5">
+                                        <button @click="openEditModal(major)" class="p-1.5 text-[#7B1113] hover:bg-[#7B1113]/10 rounded-lg transition-colors" title="Edit">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                                         </button>
-                                        <button @click="deleteMajor(major.id)" class="inline-flex items-center justify-center text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 p-2 rounded-lg transition-colors" title="Hapus">
+                                        <button @click="deleteMajor(major)" class="p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg transition-colors" title="Hapus">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                                         </button>
-                                    </td>
-                                </tr>
-                                <tr v-if="majors.data.length === 0">
-                                    <td colspan="4" class="px-6 py-8 text-center text-gray-500 bg-gray-50/50">Belum ada data jurusan.</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr v-if="majors.data.length === 0">
+                                <td colspan="4" class="py-12 px-6 text-center text-slate-400 font-medium">
+                                    Tidak ada data jurusan ditemukan.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
 
-                    <!-- Pagination -->
-                    <div class="p-6 md:px-8 border-t border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4" v-if="majors.links && majors.data.length > 0">
-                        <span class="text-sm text-gray-500">Menampilkan <span class="font-bold text-gray-900">{{ majors.from }}</span> sampai <span class="font-bold text-gray-900">{{ majors.to }}</span> dari <span class="font-bold text-gray-900">{{ majors.total }}</span> data</span>
-                        <div class="flex space-x-1">
-                            <template v-for="(link, p) in majors.links" :key="p">
-                                <a 
-                                    v-if="link.url"
-                                    :href="link.url"
-                                    class="px-3 py-1.5 border rounded-md text-sm transition-colors"
-                                    :class="link.active ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-700 hover:bg-gray-50 border-gray-300'"
-                                    v-html="link.label"
-                                ></a>
-                                <span v-else class="px-3 py-1.5 border rounded-md text-sm text-gray-400 bg-gray-50 border-gray-200" v-html="link.label"></span>
-                            </template>
-                        </div>
+                <!-- Pagination footer -->
+                <div class="bg-slate-50/50 border-t border-slate-100 px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs font-bold text-slate-400">Tampilkan</span>
+                        <select v-model="perPage" @change="handlePerPageChange" class="bg-white border border-slate-200 rounded-xl px-2 py-1 text-xs font-bold focus:outline-none focus:border-[#7B1113] text-slate-700">
+                            <option value="10">10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                            <option value="all">Semua</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center gap-1.5" v-if="majors.links && majors.links.length > 3">
+                        <Link v-for="(link, i) in majors.links" :key="i" :href="link.url || '#'" :class="[
+                            'px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200',
+                            link.active ? 'bg-[#7B1113] text-white shadow-sm' : 'text-slate-500 hover:bg-slate-150',
+                            !link.url ? 'opacity-40 cursor-not-allowed' : ''
+                        ]" v-html="link.label"></Link>
                     </div>
                 </div>
             </div>
         </div>
 
-        <Modal :show="isCreateModalOpen || isEditModalOpen" @close="closeModals">
-            <div class="bg-gradient-to-b from-green-50/50 to-white px-6 py-5 border-b border-gray-100">
-                <h2 class="text-xl font-bold text-[#0f7632] flex items-center">
-                    <svg v-if="!isEditModalOpen" class="w-6 h-6 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-                    <svg v-else class="w-6 h-6 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                    {{ isEditModalOpen ? 'Perbarui Data Jurusan' : 'Tambah Jurusan Baru' }}
-                </h2>
-            </div>
-            <div class="p-6 sm:p-8">
-
-                <form @submit.prevent="isEditModalOpen ? updateMajor() : storeMajor()">
-                    <div class="mb-4">
-                        <InputLabel for="code" value="Kode Jurusan (Contoh: RPL, TKJ)" />
-                        <TextInput id="code" v-model="form.code" type="text" class="mt-1 block w-full" required autofocus placeholder="Masukkan kode..." />
-                        <InputError :message="form.errors.code" class="mt-2" />
+        <!-- ================= ADD MODAL ================= -->
+        <div v-if="showAddModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+            <div class="bg-white rounded-3xl shadow-xl max-w-md w-full border border-slate-100 overflow-hidden transform transition-all">
+                <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
+                    <h3 class="font-extrabold text-slate-800 font-montserrat text-lg">Tambah Jurusan Baru</h3>
+                    <button @click="showAddModal = false" class="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-50"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                </div>
+                <form @submit.prevent="submitAdd" class="p-6 space-y-4">
+                    <div>
+                        <label class="block text-xs font-black text-slate-500 uppercase tracking-wider mb-1.5">Kode Jurusan</label>
+                        <input
+                            type="text"
+                            v-model="addForm.code"
+                            placeholder="Contoh: RPL, TKJ"
+                            class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 focus:bg-white focus:ring-4 focus:ring-[#7B1113]/10 focus:border-[#7B1113] rounded-2xl text-sm font-medium transition-all placeholder-slate-400"
+                        />
+                        <span v-if="addForm.errors.code" class="text-rose-500 text-xs font-semibold mt-1 block">{{ addForm.errors.code }}</span>
                     </div>
-
-                    <div class="mb-6">
-                        <InputLabel for="name" value="Nama Lengkap Jurusan" />
-                        <TextInput id="name" v-model="form.name" type="text" class="mt-1 block w-full" required placeholder="Rekayasa Perangkat Lunak..." />
-                        <InputError :message="form.errors.name" class="mt-2" />
+                    <div>
+                        <label class="block text-xs font-black text-slate-500 uppercase tracking-wider mb-1.5">Nama Jurusan</label>
+                        <input
+                            type="text"
+                            v-model="addForm.name"
+                            placeholder="Contoh: Rekayasa Perangkat Lunak"
+                            class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 focus:bg-white focus:ring-4 focus:ring-[#7B1113]/10 focus:border-[#7B1113] rounded-2xl text-sm font-medium transition-all placeholder-slate-400"
+                        />
+                        <span v-if="addForm.errors.name" class="text-rose-500 text-xs font-semibold mt-1 block">{{ addForm.errors.name }}</span>
                     </div>
-
-                    <div class="flex justify-end space-x-3 pt-4 border-t border-gray-100">
-                        <SecondaryButton @click="closeModals">Batal</SecondaryButton>
-                        <PrimaryButton :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
-                            Simpan Data
-                        </PrimaryButton>
+                    <div class="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
+                        <button type="button" @click="showAddModal = false" class="px-4 py-2.5 text-xs font-bold text-slate-500 hover:text-slate-700 bg-slate-50 hover:bg-slate-100 rounded-2xl transition-colors">Batal</button>
+                        <button type="submit" class="px-4 py-2.5 text-xs font-bold text-white bg-[#7B1113] hover:bg-[#5A0D0E] rounded-2xl transition-colors shadow-lg shadow-[#7B1113]/10">Simpan</button>
                     </div>
                 </form>
             </div>
-        </Modal>
+        </div>
 
-        <!-- Import Modal -->
-        <Modal :show="isImportModalOpen" @close="closeImportModal">
-            <div class="bg-gradient-to-b from-indigo-50/50 to-white px-6 py-5 border-b border-gray-100">
-                <h2 class="text-xl font-bold text-indigo-700 flex items-center">
-                    <svg class="w-6 h-6 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
-                    Import Data Jurusan
-                </h2>
+        <!-- ================= EDIT MODAL ================= -->
+        <div v-if="showEditModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+            <div class="bg-white rounded-3xl shadow-xl max-w-md w-full border border-slate-100 overflow-hidden transform transition-all">
+                <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
+                    <h3 class="font-extrabold text-slate-800 font-montserrat text-lg">Ubah Data Jurusan</h3>
+                    <button @click="showEditModal = false" class="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-50"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                </div>
+                <form @submit.prevent="submitEdit" class="p-6 space-y-4">
+                    <div>
+                        <label class="block text-xs font-black text-slate-500 uppercase tracking-wider mb-1.5">Kode Jurusan</label>
+                        <input
+                            type="text"
+                            v-model="editForm.code"
+                            placeholder="Contoh: RPL, TKJ"
+                            class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 focus:bg-white focus:ring-4 focus:ring-[#7B1113]/10 focus:border-[#7B1113] rounded-2xl text-sm font-medium transition-all placeholder-slate-400"
+                        />
+                        <span v-if="editForm.errors.code" class="text-rose-500 text-xs font-semibold mt-1 block">{{ editForm.errors.code }}</span>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-black text-slate-500 uppercase tracking-wider mb-1.5">Nama Jurusan</label>
+                        <input
+                            type="text"
+                            v-model="editForm.name"
+                            placeholder="Contoh: Rekayasa Perangkat Lunak"
+                            class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 focus:bg-white focus:ring-4 focus:ring-[#7B1113]/10 focus:border-[#7B1113] rounded-2xl text-sm font-medium transition-all placeholder-slate-400"
+                        />
+                        <span v-if="editForm.errors.name" class="text-rose-500 text-xs font-semibold mt-1 block">{{ editForm.errors.name }}</span>
+                    </div>
+                    <div class="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
+                        <button type="button" @click="showEditModal = false" class="px-4 py-2.5 text-xs font-bold text-slate-500 hover:text-slate-700 bg-slate-50 hover:bg-slate-100 rounded-2xl transition-colors">Batal</button>
+                        <button type="submit" class="px-4 py-2.5 text-xs font-bold text-white bg-[#7B1113] hover:bg-[#5A0D0E] rounded-2xl transition-colors shadow-lg shadow-[#7B1113]/10">Simpan Perubahan</button>
+                    </div>
+                </form>
             </div>
-            <div class="p-6 sm:p-8">
-                <form @submit.prevent="importData">
-                    <div class="mb-4">
-                        <p class="text-sm text-gray-600 mb-4">
-                            Silakan unduh template Excel terlebih dahulu, isi data sesuai format, lalu unggah kembali.
+        </div>
+
+        <!-- ================= IMPORT EXCEL MODAL ================= -->
+        <div v-if="showImportModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+            <div class="bg-white rounded-3xl shadow-xl max-w-md w-full border border-slate-100 overflow-hidden transform transition-all">
+                <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
+                    <h3 class="font-extrabold text-slate-800 font-montserrat text-lg">Impor via Excel</h3>
+                    <button @click="showImportModal = false" class="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-50"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                </div>
+                <form @submit.prevent="submitImport" class="p-6 space-y-4">
+                    <div class="p-4 bg-[#7B1113]/10 border border-indigo-100 rounded-2xl">
+                        <p class="text-xs text-[#5A0D0E] font-medium leading-relaxed">
+                            Unduh template Excel resmi di bawah ini agar kolom data sesuai dengan sistem sebelum mengimpor.
                         </p>
-                        <a :href="route('majors.template')" target="_blank" class="inline-flex items-center text-sm text-indigo-600 hover:text-indigo-900 font-medium mb-4">
-                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                        <a :href="route('majors.template')" target="_blank" class="inline-flex items-center text-xs font-bold text-[#7B1113] hover:text-indigo-800 transition-colors mt-2.5">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                             Unduh Template Excel
                         </a>
-                        
-                        <InputLabel for="file" value="Pilih File Excel (.xlsx)" />
-                        <input type="file" id="file" @change="e => importForm.file = e.target.files[0]" accept=".xlsx, .xls" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" required />
-                        <InputError :message="importForm.errors.file" class="mt-2" />
                     </div>
-
-                    <div class="flex justify-end space-x-3 pt-4 border-t border-gray-100">
-                        <SecondaryButton @click="closeImportModal">Batal</SecondaryButton>
-                        <PrimaryButton :class="{ 'opacity-25': importForm.processing }" :disabled="importForm.processing">
-                            Upload & Import
-                        </PrimaryButton>
+                    <div>
+                        <label class="block text-xs font-black text-slate-500 uppercase tracking-wider mb-1.5">File Excel (.xlsx/.xls)</label>
+                        <input
+                            type="file"
+                            accept=".xlsx, .xls"
+                            @change="handleFileSelect"
+                            class="w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#7B1113]/10 file:text-[#5A0D0E] hover:file:bg-indigo-100 border border-slate-200 rounded-2xl p-2.5 bg-slate-50 cursor-pointer"
+                        />
+                    </div>
+                    <div class="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
+                        <button type="button" @click="showImportModal = false" class="px-4 py-2.5 text-xs font-bold text-slate-500 hover:text-slate-700 bg-slate-50 hover:bg-slate-100 rounded-2xl transition-colors">Batal</button>
+                        <button type="submit" class="px-4 py-2.5 text-xs font-bold text-white bg-[#7B1113] hover:bg-[#5A0D0E] rounded-2xl transition-colors shadow-lg shadow-[#7B1113]/10">Mulai Impor</button>
                     </div>
                 </form>
             </div>
-        </Modal>
+        </div>
     </AuthenticatedLayout>
 </template>

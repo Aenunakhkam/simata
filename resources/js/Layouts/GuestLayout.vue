@@ -41,90 +41,53 @@ watch(() => page.props.flash, () => {
 </script>
 
 <template>
-    <div class="min-h-screen flex font-sans bg-[#F8F9FA] relative overflow-hidden text-slate-800">
-        <!-- Abstract Background Shapes mimicking Coretax -->
-        <div class="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
-            <div class="absolute -left-[20%] top-[-10%] w-[60%] h-[60%] rounded-full bg-gradient-to-br from-blue-100/40 to-transparent blur-3xl"></div>
-            <div class="absolute -right-[10%] bottom-[-10%] w-[50%] h-[50%] rounded-full bg-gradient-to-tl from-green-100/50 to-transparent blur-3xl"></div>
-        </div>
+    <!-- Background Merah Maroon dengan Geometric Kotak Transparan -->
+    <div class="min-h-screen font-sans bg-[#7B1113] relative overflow-hidden flex items-center justify-center selection:bg-white selection:text-[#7B1113]">
+        
+        <!-- Geometric Kotak Transparan -->
+        <div class="absolute top-[-5%] left-[-5%] w-48 h-48 sm:w-72 sm:h-72 bg-white/5 border border-white/10 rotate-12 rounded-3xl pointer-events-none"></div>
+        <div class="absolute bottom-[5%] right-[-10%] w-64 h-64 sm:w-[450px] sm:h-[450px] bg-white/5 border border-white/10 rotate-45 rounded-[40px] pointer-events-none"></div>
+        <div class="hidden lg:block absolute top-[20%] right-[10%] w-32 h-32 bg-white/10 border border-white/20 -rotate-12 rounded-2xl pointer-events-none"></div>
+        <div class="absolute bottom-[25%] left-[5%] w-32 h-32 sm:w-48 sm:h-48 bg-white/5 border border-white/10 rotate-45 rounded-2xl pointer-events-none"></div>
+        
+        <!-- Subtle Pattern Overlap -->
+        <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTAgMGg0MHY0MEgwVjB6bTEgMWgzOHYzOEgxVjF6IiBmaWxsPSJyZ2JhKDI1NSwyNTUsMjU1LDAuMDUpIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiLz48L3N2Zz4=')] opacity-50 pointer-events-none"></div>
 
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col lg:flex-row relative z-10 w-full h-full min-h-screen">
+        <div class="max-w-7xl mx-auto px-6 lg:px-12 w-full grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center relative z-10 min-h-screen py-12">
             
-            <!-- Left Side: Branding / Imagery -->
-            <div class="w-full lg:w-[55%] flex flex-col justify-between pr-0 lg:pr-12 pt-4">
+            <!-- Kiri: Info Text -->
+            <div class="flex flex-col justify-center text-center lg:text-left items-center lg:items-start max-w-xl mx-auto lg:mx-0 text-white">
                 
-                <!-- Logo Top Left -->
-                <div class="flex items-center space-x-3 mb-8 lg:mb-16">
-                    <img src="/favicon.png" alt="Logo BANKMINI" class="w-10 h-10 lg:w-12 lg:h-12 rounded-full shadow-xl border border-gray-100">
-                    <span class="text-2xl lg:text-3xl font-black text-[#0f7632] tracking-tighter" style="font-family: 'Montserrat', sans-serif;">BANKMINI</span>
-                </div>
-
-                <!-- Main Hero Text -->
-                <div class="mt-4 lg:mt-auto lg:mb-auto">
-                    <p class="text-base sm:text-lg lg:text-xl text-[#f59e0b] font-semibold tracking-wider mb-2 lg:mb-3 drop-shadow-sm" style="font-family: 'Montserrat', sans-serif;">Selamat Datang di Aplikasi <span class="italic text-transparent bg-clip-text bg-gradient-to-r from-green-500 to-emerald-600 border-b-[3px] border-emerald-500 pb-0.5 inline-block pr-1">MiniBank App</span></p>
-                    <h1 class="text-4xl sm:text-5xl lg:text-[4.5rem] font-extrabold leading-[1.1] lg:leading-[1.05] text-[#0f7632] tracking-tighter mb-4 lg:mb-6 drop-shadow-md" style="font-family: 'Montserrat', sans-serif;">
-                        Aplikasi Perbankan <br class="hidden sm:block" /> <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#0f7632] to-[#16a34a]">Mini Sekolah</span>
-                    </h1>
-                    <div class="w-16 lg:w-24 h-1.5 bg-gradient-to-r from-[#f59e0b] to-yellow-300 rounded-full mb-8 lg:mb-10 shadow-sm"></div>
-                    
-                    <!-- Promotional Banner Placeholder -->
-                    <div class="hidden lg:block w-full max-w-lg bg-white rounded-2xl shadow-xl border border-gray-100/50 p-6 relative overflow-hidden mt-8 group hover:shadow-2xl transition-all duration-300">
-                        <div class="absolute top-0 right-0 w-24 h-24 bg-blue-50 rounded-bl-full -z-10 group-hover:scale-110 transition-transform"></div>
-                        <h3 class="font-bold text-xl text-blue-900 flex items-center gap-2 mb-4">
-                            Update <span class="text-green-500">Tampilan</span>
-                            <span class="px-2 py-0.5 bg-red-500 text-white text-xs font-bold rounded-full transform -rotate-12">NEW</span>
-                        </h3>
-                        
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="flex items-start gap-2">
-                                <svg class="w-5 h-5 text-green-500 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                <div>
-                                    <p class="text-sm font-bold text-gray-800 leading-tight">Fully responsive</p>
-                                    <p class="text-xs text-gray-500">semua perangkat</p>
-                                </div>
-                            </div>
-                            <div class="flex items-start gap-2">
-                                <svg class="w-5 h-5 text-green-500 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                <div>
-                                    <p class="text-sm font-bold text-gray-800 leading-tight">User-friendly</p>
-                                    <p class="text-xs text-gray-500">tampilan lebih segar</p>
-                                </div>
-                            </div>
-                            <div class="flex items-start gap-2">
-                                <svg class="w-5 h-5 text-green-500 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                <div>
-                                    <p class="text-sm font-bold text-gray-800 leading-tight">Dashboard Interaktif</p>
-                                    <p class="text-xs text-gray-500">analitik realtime</p>
-                                </div>
-                            </div>
-                            <div class="flex items-start gap-2">
-                                <svg class="w-5 h-5 text-green-500 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                <div>
-                                    <p class="text-sm font-bold text-gray-800 leading-tight">Automasi BKU</p>
-                                    <p class="text-xs text-gray-500">direct posting</p>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="mt-4 pt-4 border-t border-gray-100">
-                            <div class="inline-block bg-yellow-400 text-[#0f7632] text-xs font-bold px-3 py-1 rounded-full">
-                                Penyempurnaan layanan dalam BANKMINI dilakukan secara bertahap.
-                            </div>
-                        </div>
+                <!-- Logo -->
+                <div class="flex items-center space-x-3.5 mb-8">
+                    <div class="w-12 h-12 shrink-0 rounded-xl bg-white flex items-center justify-center shadow-lg shadow-black/10">
+                        <svg class="w-7 h-7 text-[#7B1113]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                    </div>
+                    <div class="flex flex-col text-left">
+                        <span class="text-3xl font-black text-white tracking-tighter font-montserrat leading-none">SIMATA</span>
+                        <span class="text-[10px] font-bold text-white/70 tracking-widest uppercase mt-1">E-Learning Portal</span>
                     </div>
                 </div>
 
-                <div class="hidden lg:block mt-8 text-sm text-gray-400 font-medium pb-8">
-                    &copy; {{ new Date().getFullYear() }} BANKMINI - Aplikasi Perbankan Mini Terpadu
+                <div class="inline-flex items-center gap-2 px-4 py-1.5 bg-white/10 border border-white/20 text-white text-xs font-bold rounded-full mb-6 backdrop-blur-sm w-max">
+                    Platform Pembelajaran Digital
                 </div>
+                
+                <h1 class="text-4xl sm:text-5xl xl:text-6xl font-extrabold text-white tracking-tight font-montserrat mb-6 leading-[1.2] xl:leading-[1.1]">
+                    Belajar Lebih <br class="hidden xl:block">
+                    <span class="text-[#D4AF37]">Mudah & Interaktif</span>
+                </h1>
+                
+                <p class="text-white/80 text-base sm:text-lg font-medium mb-12 leading-relaxed max-w-lg">
+                    Tingkatkan keahlianmu bersama instruktur terbaik. Akses materi pembelajaran secara terstruktur di mana saja dan kapan saja.
+                </p>
+
             </div>
 
-            <!-- Right Side: Form Area -->
-            <div class="w-full lg:w-[45%] flex flex-col justify-center items-center py-6 lg:py-0">
-                <div class="w-full max-w-[480px]">
-                    <div class="bg-white rounded-3xl shadow-[0_10px_40px_rgb(0,0,0,0.06)] border border-gray-100 p-6 sm:p-10 w-full relative">
-                        <slot />
-                    </div>
+            <!-- Kanan: Form Card Putih -->
+            <div class="flex justify-center lg:justify-end w-full">
+                <div class="w-full max-w-[440px] bg-white rounded-[32px] shadow-2xl shadow-black/20 p-8 sm:p-10 relative overflow-hidden">
+                    <slot />
                 </div>
             </div>
 

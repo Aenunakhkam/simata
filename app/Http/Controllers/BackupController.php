@@ -41,7 +41,7 @@ class BackupController extends Controller
 
     public function create()
     {
-        $dbName = env('DB_DATABASE', 'bankmini');
+        $dbName = env('DB_DATABASE', 'simata');
         $dbUser = env('DB_USERNAME', 'postgres');
         $dbPass = env('DB_PASSWORD', 'root');
         $dbHost = env('DB_HOST', '127.0.0.1');
@@ -205,7 +205,7 @@ class BackupController extends Controller
         }
 
         // Database credentials
-        $dbName = env('DB_DATABASE', 'bankmini');
+        $dbName = env('DB_DATABASE', 'simata');
         $dbUser = env('DB_USERNAME', 'postgres');
         $dbPass = env('DB_PASSWORD', 'root');
         $dbHost = env('DB_HOST', '127.0.0.1');

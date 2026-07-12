@@ -351,7 +351,7 @@
 
     <!-- Footer -->
     <div class="footer">
-        Dokumen ini diterbitkan oleh BANKMINI. Dicetak otomatis pada {{ date('d/m/Y H:i') }}.
+        Dokumen ini diterbitkan oleh SIMATA. Dicetak otomatis pada {{ date('d/m/Y H:i') }}.
     </div>
 
 </body>

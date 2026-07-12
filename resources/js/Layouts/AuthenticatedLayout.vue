@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch, onMounted, computed } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 import { usePage, Link } from '@inertiajs/vue3';
 import Swal from 'sweetalert2';
 import Dropdown from '@/Components/Dropdown.vue';
@@ -21,12 +21,21 @@ const toggleSidebar = () => {
 // Icons as SVG strings
 const icons = {
     dashboard: `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>`,
-    transaksi: `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`,
-    pengeluaran: `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2zM10 8.5a.5.5 0 11-1 0 .5.5 0 011 0zm5 5a.5.5 0 11-1 0 .5.5 0 011 0z"></path></svg>`,
-    kategori: `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>`,
-    siswa: `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>`,
-    kelas: `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>`,
-    jurusan: `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>`,
+    courses: `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>`,
+    enrollments: `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>`,
+    profile: `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>`,
+    teachers: `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>`,
+    students: `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222"></path></svg>`,
+    classrooms: `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>`,
+    majors: `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>`,
+    subjects: `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>`,
+    users: `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>`,
+    grades: `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`,
+    attendances: `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>`,
+    academicYears: `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>`, // Calendar
+    schedules: `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`, // Clock
+    settings: `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>`,
+    backups: `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg>`,
 };
 
 const showNotification = () => {
@@ -42,12 +51,12 @@ const showNotification = () => {
             timerProgressBar: true,
         });
     }
-    if (flash?.status) {
+    if (flash?.error) {
         Swal.fire({
             toast: true,
             position: 'top-end',
-            icon: 'success',
-            title: flash.status,
+            icon: 'error',
+            title: flash.error,
             showConfirmButton: false,
             timer: 4000,
             timerProgressBar: true,
@@ -65,92 +74,148 @@ watch(() => page.props.flash, () => {
 </script>
 
 <template>
-    <div class="flex h-screen bg-[#F8F9FA] text-slate-800 font-sans overflow-hidden">
+    <div class="flex h-screen bg-slate-50 text-slate-800 font-sans overflow-hidden">
         
         <!-- Mobile Sidebar Overlay -->
-        <div v-show="showingSidebar" class="fixed inset-0 z-20 bg-black/50 transition-opacity lg:hidden" @click="toggleSidebar"></div>
+        <div v-show="showingSidebar" class="fixed inset-0 z-20 bg-slate-900/60 backdrop-blur-sm transition-opacity lg:hidden" @click="toggleSidebar"></div>
 
-        <!-- Sidebar -->
+        <!-- Sidebar (Obsidian Slate Theme) -->
         <aside :class="[
-            'fixed inset-y-0 left-0 z-30 w-64 bg-[#0f7632] text-white flex flex-col transition-all duration-300',
+            'fixed inset-y-0 left-0 z-30 w-64 bg-[#7B1113] text-white flex flex-col border-r border-white/10 transition-all duration-300',
             'lg:static lg:h-screen lg:shrink-0',
             showingSidebar ? 'translate-x-0' : '-translate-x-full lg:translate-x-0',
             desktopSidebarCollapsed ? 'lg:-ml-64' : 'lg:ml-0'
         ]">
             
             <!-- Sidebar Header / Logo -->
-            <div class="h-16 flex items-center px-6 border-b border-white/10 shrink-0">
-                <Link :href="route('dashboard')" class="flex items-center gap-3">
-                    <img src="/favicon.png" alt="Logo BANKMINI" class="w-10 h-10 rounded-full shadow-lg border border-white/20">
-                    <span class="text-2xl font-black tracking-tighter" style="font-family: 'Montserrat', sans-serif;">BANKMINI</span>
+            <div class="h-16 flex items-center px-6 border-b border-white/10 shrink-0 gap-3">
+                <Link :href="route('dashboard')" class="flex items-center gap-3 group">
+                    <div class="w-9 h-9 rounded-xl bg-white flex items-center justify-center shadow-md shadow-black/10 group-hover:scale-105 transition-transform duration-300">
+                        <svg class="w-5 h-5 text-[#7B1113]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                    </div>
+                    <span class="text-xl font-black text-white tracking-tight font-montserrat">SIMATA</span>
                 </Link>
             </div>
 
             <!-- Sidebar Navigation -->
-            <nav class="flex-1 overflow-y-auto py-4 space-y-6">
-                <!-- Main Dashboard -->
-                <div>
-                    <SidebarLink :href="route('dashboard')" :active="route().current('dashboard')" :icon="icons.dashboard">
-                        Dashboard
-                    </SidebarLink>
+            <nav class="flex-1 overflow-y-auto py-6 space-y-6 px-3">
+                <!-- MENU ADMIN -->
+                <div v-if="$page.props.auth.user.role === 'admin'" class="space-y-6">
+                    <div>
+                        <div class="px-5 text-[10px] font-bold text-white/50 uppercase tracking-widest mb-2.5">Menu Utama</div>
+                        <SidebarLink :href="route('dashboard')" :active="route().current('dashboard')" :icon="icons.dashboard">
+                            Dashboard
+                        </SidebarLink>
+                    </div>
+
+                    <div>
+                        <div class="px-5 text-[10px] font-bold text-white/50 uppercase tracking-widest mb-2.5">Akademik & Penempatan</div>
+                        <SidebarLink :href="route('academic-years.index')" :active="route().current('academic-years.*')" :icon="icons.academicYears">
+                            Tahun Ajaran
+                        </SidebarLink>
+                        <SidebarLink :href="route('schedules.index')" :active="route().current('schedules.*')" :icon="icons.schedules">
+                            Jadwal & Penempatan
+                        </SidebarLink>
+                    </div>
+
+                    <div>
+                        <div class="px-5 text-[10px] font-bold text-white/50 uppercase tracking-widest mb-2.5">Data Master</div>
+                        <SidebarLink :href="route('teachers.index')" :active="route().current('teachers.*')" :icon="icons.teachers">
+                            Data Guru
+                        </SidebarLink>
+                        <SidebarLink :href="route('students.index')" :active="route().current('students.*')" :icon="icons.students">
+                            Data Siswa
+                        </SidebarLink>
+                        <SidebarLink :href="route('classrooms.index')" :active="route().current('classrooms.*')" :icon="icons.classrooms">
+                            Data Kelas
+                        </SidebarLink>
+                        <SidebarLink :href="route('majors.index')" :active="route().current('majors.*')" :icon="icons.majors">
+                            Data Jurusan
+                        </SidebarLink>
+                        <SidebarLink :href="route('subjects.index')" :active="route().current('subjects.*')" :icon="icons.subjects">
+                            Mata Pelajaran
+                        </SidebarLink>
+                    </div>
+
+                    <div>
+                        <div class="px-5 text-[10px] font-bold text-white/50 uppercase tracking-widest mb-2.5">Rekapitulasi</div>
+                        <SidebarLink :href="route('grades.index')" :active="route().current('grades.*')" :icon="icons.grades">
+                            Nilai Siswa
+                        </SidebarLink>
+                        <SidebarLink :href="route('attendances.index')" :active="route().current('attendances.*')" :icon="icons.attendances">
+                            Presensi Siswa
+                        </SidebarLink>
+                    </div>
+
+                    <div>
+                        <div class="px-5 text-[10px] font-bold text-white/50 uppercase tracking-widest mb-2.5">Keamanan</div>
+                        <SidebarLink :href="route('users.index')" :active="route().current('users.*')" :icon="icons.users">
+                            Data Pengguna
+                        </SidebarLink>
+                    </div>
+
+                    <div>
+                        <div class="px-5 text-[10px] font-bold text-white/50 uppercase tracking-widest mb-2.5">Konfigurasi</div>
+                        <SidebarLink :href="route('system-settings.index')" :active="route().current('system-settings.*')" :icon="icons.settings">
+                            Pengaturan Sistem
+                        </SidebarLink>
+                        <SidebarLink :href="route('backups.index')" :active="route().current('backups.*')" :icon="icons.backups">
+                            Backup & Restore
+                        </SidebarLink>
+                        <SidebarLink :href="route('updates.index')" :active="route().current('updates.*')" :icon="`<svg fill='none' stroke='currentColor' viewBox='0 0 24 24'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15'></path></svg>`">
+                            Cek Pembaruan
+                        </SidebarLink>
+                    </div>
                 </div>
 
-                <!-- Keuangan Section -->
-                <div>
-                    <div class="px-5 text-[11px] font-bold text-yellow-400/70 uppercase tracking-widest mb-2">Layanan Teller</div>
-                    <SidebarLink :href="route('teller.index')" :active="route().current('teller.*')" :icon="`<svg fill='none' stroke='currentColor' viewBox='0 0 24 24'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z'></path></svg>`">
-                        Setor & Tarik Tunai
-                    </SidebarLink>
+                <!-- MENU GURU -->
+                <div v-else-if="$page.props.auth.user.role === 'guru'" class="space-y-6">
+                    <div>
+                        <div class="px-5 text-[10px] font-bold text-white/50 uppercase tracking-widest mb-2.5">Menu Utama</div>
+                        <SidebarLink :href="route('dashboard')" :active="route().current('dashboard')" :icon="icons.dashboard">
+                            Dashboard
+                        </SidebarLink>
+                    </div>
+
+                    <div>
+                        <div class="px-5 text-[10px] font-bold text-white/50 uppercase tracking-widest mb-2.5">Akademik</div>
+                        <SidebarLink :href="route('grades.index')" :active="route().current('grades.*')" :icon="icons.grades">
+                            Input Nilai
+                        </SidebarLink>
+                        <SidebarLink :href="route('attendances.index')" :active="route().current('attendances.*')" :icon="icons.attendances">
+                            Input Presensi
+                        </SidebarLink>
+                    </div>
                 </div>
 
-                <!-- Catatan Keuangan Section -->
-                <div>
-                    <div class="px-5 text-[11px] font-bold text-yellow-400/70 uppercase tracking-widest mb-2 mt-4">Catatan Keuangan</div>
-                    <SidebarLink :href="route('catatan-keuangan.pemasukan')" :active="route().current('catatan-keuangan.pemasukan')" :icon="`<svg fill='none' stroke='currentColor' viewBox='0 0 24 24'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M13 7h8m0 0v8m0-8l-8 8-4-4-6 6'></path></svg>`">
-                        Pemasukan
-                    </SidebarLink>
-                    <SidebarLink :href="route('catatan-keuangan.pengeluaran')" :active="route().current('catatan-keuangan.pengeluaran')" :icon="`<svg fill='none' stroke='currentColor' viewBox='0 0 24 24'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M13 17h8m0 0V9m0 8l-8-8-4 4-6-6'></path></svg>`">
-                        Pengeluaran
-                    </SidebarLink>
-                    <SidebarLink :href="route('catatan-keuangan.laporan')" :active="route().current('catatan-keuangan.laporan')" :icon="`<svg fill='none' stroke='currentColor' viewBox='0 0 24 24'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z'></path></svg>`">
-                        Laporan Keuangan
-                    </SidebarLink>
+                <!-- MENU SISWA / FALLBACK -->
+                <div v-else class="space-y-6">
+                    <div>
+                        <div class="px-5 text-[10px] font-bold text-white/50 uppercase tracking-widest mb-2.5">Menu Utama</div>
+                        <SidebarLink :href="route('dashboard')" :active="route().current('dashboard')" :icon="icons.dashboard">
+                            Dashboard
+                        </SidebarLink>
+                        <SidebarLink :href="route('courses.index')" :active="route().current('courses.*')" :icon="icons.courses">
+                            Daftar Kelas
+                        </SidebarLink>
+                        <SidebarLink :href="route('enrollments.index')" :active="route().current('enrollments.*')" :icon="icons.enrollments">
+                            Kelas Saya
+                        </SidebarLink>
+                    </div>
                 </div>
 
-                <!-- Data Master Section -->
+                <!-- PENGATURAN AKUN (SEMUA ROLE) -->
                 <div>
-                    <div class="px-5 text-[11px] font-bold text-yellow-400/70 uppercase tracking-widest mb-2 mt-6">Data Nasabah & Master</div>
-                    <SidebarLink :href="route('academic-years.index')" :active="route().current('academic-years.*')" :icon="`<svg fill='none' stroke='currentColor' viewBox='0 0 24 24'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z'></path></svg>`">
-                        Tahun Ajaran
-                    </SidebarLink>
-                    <SidebarLink :href="route('students.index')" :active="route().current('students.*')" :icon="icons.siswa">
-                        Daftar Nasabah (Siswa)
-                    </SidebarLink>
-                    <SidebarLink :href="route('classrooms.index')" :active="route().current('classrooms.*')" :icon="icons.kelas">
-                        Data Kelas
-                    </SidebarLink>
-                    <SidebarLink :href="route('majors.index')" :active="route().current('majors.*')" :icon="icons.jurusan">
-                        Data Jurusan
-                    </SidebarLink>
-                </div>
-                <!-- Pengaturan Section -->
-                <div>
-                    <div class="px-5 text-[11px] font-bold text-yellow-400/70 uppercase tracking-widest mb-2 mt-2">Pengaturan & Sistem</div>
-                    <SidebarLink :href="route('settings.index')" :active="route().current('settings.*')" :icon="`<svg fill='none' stroke='currentColor' viewBox='0 0 24 24'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z'></path><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M15 12a3 3 0 11-6 0 3 3 0 016 0z'></path></svg>`">
-                        Pengaturan Bank
-                    </SidebarLink>
-                    <SidebarLink :href="route('backup.index')" :active="route().current('backup.*')" :icon="`<svg fill='none' stroke='currentColor' viewBox='0 0 24 24'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4'></path></svg>`">
-                        Backup Data
-                    </SidebarLink>
-                    <SidebarLink :href="route('updates')" :active="route().current('updates')" :icon="`<svg fill='none' stroke='currentColor' viewBox='0 0 24 24'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'></path></svg>`">
-                        Cek Pembaruan
+                    <div class="px-5 text-[10px] font-bold text-white/50 uppercase tracking-widest mb-2.5">Akun Saya</div>
+                    <SidebarLink :href="route('profile.edit')" :active="route().current('profile.edit')" :icon="icons.profile">
+                        Profil Saya
                     </SidebarLink>
                 </div>
             </nav>
 
             <!-- Sidebar Footer -->
-            <div class="p-4 border-t border-white/10 text-xs font-medium text-yellow-200/50 text-center">
-                &copy; {{ new Date().getFullYear() }} BANKMINI
+            <div class="p-4 border-t border-white/10 text-[10px] font-semibold text-white/50 text-center uppercase tracking-wider">
+                &copy; {{ new Date().getFullYear() }} SIMATA STUDY
             </div>
         </aside>
 
@@ -158,45 +223,43 @@ watch(() => page.props.flash, () => {
         <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
             
             <!-- Top Navbar -->
-            <header class="bg-white shadow-[0_4px_20px_rgb(0,0,0,0.02)] h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8 z-10 shrink-0 border-b border-gray-100">
+            <header class="bg-white/80 backdrop-blur-md shadow-[0_1px_3px_rgba(0,0,0,0.02)] h-16 flex items-center justify-between px-6 z-10 shrink-0 border-b border-slate-100">
                 
                 <!-- Left: Hamburger & Header Title -->
                 <div class="flex items-center gap-4 min-w-0">
-                    <button @click="toggleSidebar" class="p-2 -ml-2 text-gray-500 hover:text-[#0f7632] hover:bg-green-50 rounded-lg transition-colors focus:outline-none">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                    <button @click="toggleSidebar" class="p-2 -ml-2 text-slate-400 hover:text-[#7B1113] hover:bg-rose-50 rounded-xl transition-all duration-200 focus:outline-none">
+                        <svg class="w-5.5 h-5.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                     </button>
-                    <div class="truncate" v-if="$slots.header">
+                    <div class="truncate text-lg font-bold text-slate-800 font-montserrat" v-if="$slots.header">
                         <slot name="header" />
                     </div>
                 </div>
 
                 <!-- Right: Profile Dropdown -->
                 <div class="flex items-center shrink-0 ml-4">
-                    <div class="hidden sm:flex items-center px-4 py-1.5 mr-4 bg-green-50/50 rounded-full border border-green-100">
-                        <svg class="w-4 h-4 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                        <span class="text-xs font-bold text-green-800">T.A: {{ $page.props.active_academic_year ? $page.props.active_academic_year.name : 'Belum Dipilih' }}</span>
-                    </div>
-
                     <Dropdown align="right" width="48">
                         <template #trigger>
-                            <button type="button" class="flex items-center gap-2 bg-gray-50 hover:bg-gray-100 border border-gray-200 px-2 sm:px-3 py-1.5 rounded-xl transition-colors focus:outline-none">
-                                <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-r from-[#0f7632] to-[#f59e0b] flex items-center justify-center text-white shadow-sm">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                            <button type="button" class="flex items-center gap-2.5 bg-slate-50 hover:bg-slate-100/80 border border-slate-200/60 pl-2.5 pr-3.5 py-1.5 rounded-2xl transition-all duration-200 focus:outline-none group">
+                                <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#7B1113] to-[#A51C30] flex items-center justify-center text-[#D4AF37] shadow-sm font-bold text-sm tracking-wide font-montserrat">
+                                    {{ $page.props.auth.user.name ? $page.props.auth.user.name.charAt(0).toUpperCase() : 'U' }}
                                 </div>
-                                <span class="text-sm font-bold text-gray-700 hidden sm:block">{{ $page.props.auth.user.npsn }}</span>
-                                <svg class="w-4 h-4 text-gray-400 hidden sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                <div class="text-left hidden sm:block">
+                                    <p class="text-xs font-bold text-slate-700 leading-none mb-0.5 group-hover:text-slate-900 transition-colors">{{ $page.props.auth.user.name }}</p>
+                                    <p class="text-[9px] font-bold text-[#7B1113] leading-none uppercase tracking-wider">{{ $page.props.auth.user.role }}</p>
+                                </div>
+                                <svg class="w-4 h-4 text-slate-400 group-hover:text-slate-600 transition-all duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                             </button>
                         </template>
 
                         <template #content>
-                            <div class="px-4 py-3 border-b border-gray-100">
-                                <p class="text-xs text-gray-500 font-medium">Masuk sebagai</p>
-                                <p class="text-sm font-bold text-[#0f7632] truncate">{{ $page.props.auth.user.email }}</p>
+                            <div class="px-4 py-3 border-b border-slate-100">
+                                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-0.5">Siswa Aktif</p>
+                                <p class="text-xs font-bold text-slate-800 truncate">{{ $page.props.auth.user.email }}</p>
                             </div>
-                            <DropdownLink :href="route('profile.edit')" class="font-medium text-sm text-gray-700 hover:text-[#0f7632] hover:bg-green-50">
+                            <DropdownLink :href="route('profile.edit')" class="font-semibold text-xs text-slate-600 hover:text-[#7B1113] hover:bg-rose-50">
                                 Pengaturan Profil
                             </DropdownLink>
-                            <DropdownLink :href="route('logout')" method="post" as="button" class="font-medium text-sm text-red-600 hover:text-red-700 hover:bg-red-50 border-t border-gray-50">
+                            <DropdownLink :href="route('logout')" method="post" as="button" class="font-bold text-xs text-rose-600 hover:text-rose-700 hover:bg-rose-50 border-t border-slate-50 w-full text-left">
                                 Keluar Sistem
                             </DropdownLink>
                         </template>
@@ -205,7 +268,7 @@ watch(() => page.props.flash, () => {
             </header>
 
             <!-- Page Content -->
-            <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+            <main class="flex-1 overflow-y-auto p-6 lg:p-8">
                 <slot />
             </main>
         </div>

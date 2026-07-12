@@ -22,7 +22,23 @@ class User extends Authenticatable
         'npsn',
         'email',
         'password',
+        'role',
     ];
+
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    public function isGuru(): bool
+    {
+        return $this->role === 'guru';
+    }
+
+    public function isSiswa(): bool
+    {
+        return $this->role === 'siswa';
+    }
 
     /**
      * Get the attributes that should be cast.

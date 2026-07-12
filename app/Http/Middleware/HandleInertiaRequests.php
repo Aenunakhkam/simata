@@ -29,14 +29,6 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
-        $activeYearId = $request->session()->get('academic_year_id');
-        $activeYear = null;
-        if ($activeYearId) {
-            $activeYear = \App\Models\AcademicYear::find($activeYearId);
-        } else {
-            $activeYear = \App\Models\AcademicYear::where('is_active', true)->first();
-        }
-
         return [
             ...parent::share($request),
             'auth' => [
@@ -47,7 +39,6 @@ class HandleInertiaRequests extends Middleware
                 'success' => fn () => $request->session()->get('success') ?? $request->session()->get('message'),
                 'error' => fn () => $request->session()->get('error'),
             ],
-            'active_academic_year' => $activeYear,
         ];
     }
 }
