@@ -92,5 +92,12 @@ watch(() => page.props.flash, () => {
             </div>
 
         </div>
+
+        <!-- Footer -->
+        <div class="absolute bottom-4 w-full text-center z-10">
+            <p class="text-white/60 text-xs font-medium">
+                &copy; {{ new Date().getFullYear() }} Simata. All rights reserved.
+            </p>
+        </div>
     </div>
 </template>

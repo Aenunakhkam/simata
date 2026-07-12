@@ -215,7 +215,7 @@ watch(() => page.props.flash, () => {
 
             <!-- Sidebar Footer -->
             <div class="p-4 border-t border-white/10 text-[10px] font-semibold text-white/50 text-center uppercase tracking-wider">
-                &copy; {{ new Date().getFullYear() }} SIMATA STUDY
+                &copy; {{ new Date().getFullYear() }} Simata
             </div>
         </aside>
 
@@ -268,8 +268,16 @@ watch(() => page.props.flash, () => {
             </header>
 
             <!-- Page Content -->
-            <main class="flex-1 overflow-y-auto p-6 lg:p-8">
-                <slot />
+            <main class="flex-1 overflow-y-auto p-6 lg:p-8 flex flex-col">
+                <div class="flex-1">
+                    <slot />
+                </div>
+                <!-- Main Content Footer -->
+                <footer class="mt-8 pt-4 border-t border-slate-100 text-center shrink-0">
+                    <p class="text-slate-400 text-xs font-medium">
+                        &copy; {{ new Date().getFullYear() }} Simata. All rights reserved.
+                    </p>
+                </footer>
             </main>
         </div>
     </div>
