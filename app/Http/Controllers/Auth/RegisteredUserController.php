@@ -40,12 +40,14 @@ class RegisteredUserController extends Controller
             'email.unique' => 'Email yang Anda masukkan sudah terdaftar.',
         ]);
 
+        $isFirstUser = User::count() === 0;
+
         $user = User::create([
             'name' => $request->name,
             'npsn' => $request->npsn,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role' => 'admin',
+            'role' => $isFirstUser ? 'admin' : 'siswa',
         ]);
 
         event(new Registered($user));
